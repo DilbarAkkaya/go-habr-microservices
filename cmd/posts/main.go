@@ -5,8 +5,12 @@ import (
 	"habr-app/internal/config"
 	"habr-app/internal/database"
 	"habr-app/internal/handlers"
+	"habr-app/internal/middleware"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/redis/go-redis/v9"
 )
 
 func recoverMiddleware(next http.Handler) http.Handler {
@@ -22,21 +26,22 @@ func recoverMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
-	fmt.Println("Auth service starting...")
-
+	if os.Getenv("JWT_SECRET") == "" {
+		log.Fatal("JWT_SECRET not set")
+	}
 	db, err := database.Connect()
 	if err != nil {
 		log.Fatal("db connect:", err)
 	}
 	defer db.Close()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/register", handlers.RegisterHandler(db))
-	mux.HandleFunc("/login", handlers.LoginHandler(db))
-	mux.HandleFunc("/verify", handlers.VerifyEmailHandler(db))
-
-	port := config.GetServerPort("8081")
-	log.Println("Server listening on :" + port)
-
-	log.Fatal(http.ListenAndServe(":"+port, recoverMiddleware(mux)))
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: config.GetRedisAddr(),
+	})
+	defer redisClient.Close()
+	fmt.Println("Posts servcie started on :8082")
+	http.Handle("/articles", middleware.JWTAuth(handlers.ArticlesHandler(db, redisClient)))
+	http.Handle("/articles/", middleware.JWTAuth(handlers.ArticleHandler(db, redisClient)))
+	port := config.GetServerPort("8082")
+	log.Fatal(http.ListenAndServe(":"+port, recoverMiddleware(http.DefaultServeMux)))
 }

@@ -22,7 +22,7 @@ func Connect()(*sql.DB, error){
 }
 
 func InitSchema(db *sql.DB) error{
-	migrationQuery, err := os.ReadFile("migrations/000001_create_users_table.up.sql")
+	migrationQuery, err := os.ReadFile("/app/migrations/000001_create_users_table.up.sql")
 if err !=nil {
 	return fmt.Errorf("Cannot read file migration %w", err)
 }
