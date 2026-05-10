@@ -38,7 +38,7 @@ func GetArticle(db *sql.DB, id int) (*models.Article, error) {
 		WHERE id = $1
 	`
 	art := &models.Article{}
-	err := db.QueryRow(query, id).Scan(&art.ID, &art.Title, &art.Body, &art.CreatedAt, &art.UpdatedAt)
+	err := db.QueryRow(query, id).Scan(&art.ID, &art.AuthorID, &art.Title, &art.Body, &art.CreatedAt, &art.UpdatedAt)
 	return art, err
 }
 
