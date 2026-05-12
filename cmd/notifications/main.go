@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"habr-app/internal/config"
 	"log"
+
+	"github.com/DilbarAkkaya/go-habr-microservices/internal/config"
 
 	"github.com/segmentio/kafka-go"
 )

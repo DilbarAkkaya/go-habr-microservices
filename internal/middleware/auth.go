@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"habr-app/internal/utils"
+	"github.com/DilbarAkkaya/go-habr-microservices/internal/utils"
 )
 
 type contextKey string

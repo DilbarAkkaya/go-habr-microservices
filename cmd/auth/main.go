@@ -2,24 +2,14 @@ package main
 
 import (
 	"fmt"
-	"habr-app/internal/config"
-	"habr-app/internal/database"
-	"habr-app/internal/handlers"
 	"log"
 	"net/http"
-)
 
-func recoverMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if err := recover(); err != nil {
-				log.Printf("PANIC RECOVERED: %v", err)
-				http.Error(w, "internal server error", http.StatusInternalServerError)
-			}
-		}()
-		next.ServeHTTP(w, r)
-	})
-}
+	"github.com/DilbarAkkaya/go-habr-microservices/internal/config"
+	"github.com/DilbarAkkaya/go-habr-microservices/internal/database"
+	"github.com/DilbarAkkaya/go-habr-microservices/internal/handlers"
+	"github.com/DilbarAkkaya/go-habr-microservices/internal/middleware"
+)
 
 func main() {
 	fmt.Println("Auth service starting...")
@@ -38,5 +28,5 @@ func main() {
 	port := config.GetServerPort("8081")
 	log.Println("Server listening on :" + port)
 
-	log.Fatal(http.ListenAndServe(":"+port, recoverMiddleware(mux)))
+	log.Fatal(http.ListenAndServe(":"+port, middleware.RecoverMiddleware(mux)))
 }

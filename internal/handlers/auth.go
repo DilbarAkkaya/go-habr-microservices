@@ -4,23 +4,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"habr-app/internal/broker"
-	"habr-app/internal/database"
-	"habr-app/internal/models"
-	"habr-app/internal/utils"
 	"log"
 	"net/http"
+
+	"github.com/DilbarAkkaya/go-habr-microservices/internal/broker"
+	"github.com/DilbarAkkaya/go-habr-microservices/internal/database"
+	"github.com/DilbarAkkaya/go-habr-microservices/internal/dto/models"
+	"github.com/DilbarAkkaya/go-habr-microservices/internal/utils"
 )
-
-type registerRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type loginRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
 
 func RegisterHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +19,7 @@ func RegisterHandler(db *sql.DB) http.HandlerFunc {
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		var req registerRequest
+		var req models.RegisterRequest
 		if err := json.NewDecoder(r.Body).Decode((&req)); err != nil {
 			http.Error(w, "Invalid request", http.StatusBadRequest)
 			return
@@ -70,7 +61,7 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 			return
 
 		}
-		var req loginRequest
+		var req models.LoginRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "invalid request", http.StatusBadRequest)
 			return

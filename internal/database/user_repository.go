@@ -3,8 +3,9 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"habr-app/internal/models"
 	"strings"
+
+	"github.com/DilbarAkkaya/go-habr-microservices/internal/dto/models"
 )
 
 var ErrUserAlreadyExists = errors.New("user already exists")
@@ -27,9 +28,9 @@ func CreateUser(db *sql.DB, user *models.User) error {
 
 func GetUserByEmail(db *sql.DB, email string) (*models.User, error) {
 	query := `
-	SELECT id, email, password_hash, email_confirmed, verification_token, created_at
-	FROM users
-	WHERE email=$1
+	    SELECT id, email, password_hash, email_confirmed, verification_token, created_at
+	    FROM users
+	    WHERE email=$1
 	`
 	user := &models.User{}
 	err := db.QueryRow(query, email).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.EmailConfirmed, &user.VerificationToken, &user.CreatedAt)
@@ -44,7 +45,7 @@ func ConfirmUserEmail(db *sql.DB, token string) error {
 	    UPDATE users 
 	    SET email_confirmed = true, verification_token = ''
 		WHERE verification_token = $1
-		`
+	`
 	res, err := db.Exec(query, token)
 	if err != nil {
 		return err
